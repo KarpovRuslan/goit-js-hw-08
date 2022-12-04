@@ -1,30 +1,29 @@
 import throttle from 'lodash.throttle';
 
-const refs = {
-    form: document.querySelector('.feedback-form'),
-    email: document.querySelector('.feedback-form input'),
-    message: document.querySelector('.feedback-form textarea'),
-}
-
-const formData = {
-    email: '',
-    message: '',
-};
-
+const form = document.querySelector('.feedback-form');
 const LOCALSTORAGE_KEY = 'feedback-form-state';
 
-refs.form.addEventListener('submit', onFormSubmit);
-refs.form.addEventListener('input', throttle(onTextareaInput, 500));
+form.addEventListener('submit', onFormSubmit);
+form.addEventListener('input', throttle(onTextareaInput, 500));
 
+getFormData();  
 
 function onFormSubmit(e) {
     e.preventDefault();
-    e.currentTarget.reset();
-    console.log(formData);
+    if (!form.elements.email.value || !form.elements.message.value) {
+        return alert('Будь-ласка заповніть всі поля!');
+    }
+    console.log({email:form.elements.email.value, message: form.elements.message.value});
+    e.currentTarget.reset(); 
     localStorage.removeItem(LOCALSTORAGE_KEY);
 };
 
 function onTextareaInput(e) {
+    const formData = {
+        email: form.elements.email.value,
+        message: form.elements.message.value,
+    };
+    
     formData[e.target.name] = e.target.value;
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(formData));
 }
@@ -34,12 +33,12 @@ function getFormData() {
     const parsedData = JSON.parse(getData);
 
     if (parsedData) {
-        refs.form.email.value = parsedData.email;
-        refs.form.message.value = parsedData.message;
+        form.elements.email.value = parsedData.email;
+        form.elements.message.value = parsedData.message;
     }
 }
 
-getFormData();  
+
 
 
     
